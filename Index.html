@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>GTA6VI Secure Checkout</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .box {
+      max-width: 450px;
+      margin: 80px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .price {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: 0;
+      border-radius: 8px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #error {
+      color: red;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+
+    <h1>GTA6VI Secure Checkout</h1>
+
+    <p>Demo Product</p>
+
+    <div class="price">€10.00</div>
+
+    <button id="payButton">
+      Pay securely with Stripe
+    </button>
+
+    <div id="error"></div>
+
+  </div>
+
+  <script>
+
+    const button = document.getElementById("payButton");
+    const error = document.getElementById("error");
+
+    button.addEventListener("click", async () => {
+
+      button.disabled = true;
+      button.textContent = "Opening Stripe...";
+      error.textContent = "";
+
+      try {
+
+        const response = await fetch(
+          "/api/create-checkout-session",
+          {
+            method: "POST"
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Payment error"
+          );
+        }
+
+        window.location.href = data.url;
+
+      } catch (err) {
+
+        error.textContent = err.message;
+
+        button.disabled = false;
+        button.textContent =
+          "Pay securely with Stripe";
+
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
